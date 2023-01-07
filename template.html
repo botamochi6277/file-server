@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>{directory}</title>
+  <title>Explorer | {directory}</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js" crossorigin="anonymous"></script>
@@ -135,6 +135,12 @@
         if (audio_found) {
           return 'audio'
         }
+        const txt_found = ['md', 'txt', 'py'].find(
+          (e) => e === this.state.file_format,
+        )
+        if (txt_found) {
+          return 'iframe'
+        }
         return ''
       }
 
@@ -145,8 +151,10 @@
           Typography,
           CardContent,
           Button,
+          IconButton,
           Chip,
           Stack,
+          Grid,
         } = MaterialUI
 
         return (
@@ -164,13 +172,33 @@
                 </Typography>
               </Stack>
             </CardContent>
-            <CardMedia
-              // sx={{ height: 140 }}
-              // maxHeight={400}
-              image={this.state.src_list[this.state.idx].href}
-              component={this.mediaType()}
-              title={this.state.src_list[this.state.idx].href}
-            />
+            <CardContent>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={1} sx={{height:'100%'}}>
+                <Button
+                  variant="outlined"
+                  onClick={this.onClickPrevButton}
+                  fullWidth
+                >
+                  <Icon icon="navigate_before" />
+                </Button></Grid>
+                <Grid item xs={10}>
+                <CardMedia
+                  sx={{ maxHeight: 600,  objectFit: "scale-down" }}
+                  src={this.state.src_list[this.state.idx].href}
+                  component={this.mediaType()}
+                  title={this.state.src_list[this.state.idx].href}
+                /></Grid>
+                <Grid item xs={1}>
+                <Button
+                  variant="outlined"
+                  onClick={this.onClickNextButton}
+                  fullWidth
+                >
+                  <Icon icon="navigate_next" />
+                </Button></Grid>
+              </Grid>
+            </CardContent>
             <CardContent>
               <Stack direction="row" spacing={2}>
                 <Button
