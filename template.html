@@ -31,8 +31,57 @@
   </div>
   <script type="text/babel">
     'use strict'
+
+    const parsePath = (s) => {
+      const path_arr = s.href.split('/')
+      const basename = path_arr[path_arr.length - 1]
+      const b = basename.split('.')
+      return ({
+        dirname: path_arr.length === 1 ? '' : path_arr[path_arr.length - 2],
+        basename: basename,
+        file_format: b[b.length - 1],
+      })
+    }
+
+    const mediaType = (file_format) => {
+      // component="video, audio, picture, iframe, or img".
+
+      const img_found = ['jpeg', 'jpg', 'png', 'webp', 'ico'].find(
+        (e) => e === file_format,
+      )
+      if (img_found) {
+        return 'img'
+      }
+
+      const video_found = ['mp4', 'wmv', 'mkv', 'webm'].find(
+        (e) => e === file_format,
+      )
+      if (video_found) {
+        return 'video'
+      }
+
+      const audio_found = ['mp3', 'wav'].find(
+        (e) => e === file_format,
+      )
+      if (audio_found) {
+        return 'audio'
+      }
+      const txt_found = ['md', 'txt', 'py'].find(
+        (e) => e === file_format,
+      )
+      if (txt_found) {
+        return 'iframe'
+      }
+      return ''
+    }
+
+
     const Icon = (props) => {
       return <span class="material-symbols-outlined">{props.icon}</span>
+    }
+
+    const FileIcon = (props) => {
+      const file = props.file
     }
 
     const useWindowSize = () => {
@@ -83,17 +132,9 @@
         CardMedia,
         Typography,
         CardContent,
-        ButtonGroup,
-        Button,
         Chip,
         Stack,
-        List,
-        ListItem,
-        ListItemIcon,
-        ListItemText,
-        ListItemButton,
         Link,
-        ListItemAvatar,
         Avatar,
         TableContainer,
         Table,
@@ -186,15 +227,12 @@
       }
 
 
-
       idxUpdate = (i) => {
-        const path_arr = this.state.src_list[i].href.split('/')
-        const basename = path_arr[path_arr.length - 1]
-        const b = basename.split('.')
+        const p = parsePath(this.state.src_list[i])
         this.setState({
           idx: i,
-          basename: basename,
-          file_format: b[b.length - 1],
+          basename: p.basename,
+          file_format: p.file_format,
         })
       }
 
@@ -213,37 +251,7 @@
         this.idxUpdate(idx)
       }
 
-      mediaType = () => {
-        // component="video, audio, picture, iframe, or img".
 
-        const img_found = ['jpeg', 'jpg', 'png', 'webp', 'ico'].find(
-          (e) => e === this.state.file_format,
-        )
-        if (img_found) {
-          return 'img'
-        }
-
-        const video_found = ['mp4', 'wmv', 'mkv', 'webm'].find(
-          (e) => e === this.state.file_format,
-        )
-        if (video_found) {
-          return 'video'
-        }
-
-        const audio_found = ['mp3', 'wav'].find(
-          (e) => e === this.state.file_format,
-        )
-        if (audio_found) {
-          return 'audio'
-        }
-        const txt_found = ['md', 'txt', 'py'].find(
-          (e) => e === this.state.file_format,
-        )
-        if (txt_found) {
-          return 'iframe'
-        }
-        return ''
-      }
 
       render() {
         const {
@@ -277,7 +285,7 @@
             <CardMedia
               sx={{ maxHeight: 0.8 * this.state.window_size[1], objectFit: "scale-down" }}
               src={this.state.src_list[this.state.idx].href}
-              component={this.mediaType()}
+              component={mediaType(this.state.file_format)}
               title={this.state.src_list[this.state.idx].href}
             />
             <CardContent>
