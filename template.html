@@ -1,256 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>listing directory {directory}</title>
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.production.min.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
-    ></script>
-    <script
-      src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js"
-      crossorigin="anonymous"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"
-    />
 
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <!-- <script
+<head>
+  <title>{directory}</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <!-- <script
       src="https://cdn.jsdelivr.net/npm/@acidic9/pure-react-carousel@0.0.0-semantically-released/dist/index.cjs.min.js"
       crossorigin="anonymous"
     ></script> -->
-    <style>
-      {style}
+  <style>
+    {style}
 
-      .MuiCard-root{
-        margin: 1em;
-      }
-    </style>
-  </head>
-  <!-- https://cpoint-lab.co.jp/article/202204/22592/ -->
-  <body class="directory">
-    <div class="myapp">
-      <div class="dark-switch"></div>
-      <div class="preview-card"></div>
-      <div class="files-card"></div>
-      <!-- <div>
+    .MuiCard-root {
+      margin: 1em;
+    }
+  </style>
+</head>
+<!-- https://cpoint-lab.co.jp/article/202204/22592/ -->
+
+<body class="directory">
+  <div class="myapp">
+    <div class="dark-switch"></div>
+    <div class="preview-card"></div>
+    <div class="files-card"></div>
+    <!-- <div>
         <h3>
           {linked-path}
         </h3>
         {files}
       </div> -->
-    </div>
-    <script type="text/babel">
-      'use strict'
-      const Icon = (props) => {
-        return <span class="material-symbols-outlined">{props.icon}</span>
+  </div>
+  <script type="text/babel">
+    'use strict'
+    const Icon = (props) => {
+      return <span class="material-symbols-outlined">{props.icon}</span>
+    }
+
+    const FilesCard = (props) => {
+      const {
+        Card,
+        CardMedia,
+        Typography,
+        CardContent,
+        ButtonGroup,
+        Button,
+        Chip,
+        Stack,
+      } = MaterialUI
+      return (
+        <Card>
+          <CardContent>
+            <Typography variant="h6">{directory}</Typography>
+            {files}
+          </CardContent>
+        </Card>
+      )
+    }
+
+    class PreviewCard extends React.Component {
+      constructor(props) {
+        super(props)
+        const src_list = files.querySelectorAll('a')
+        // console.log(`src_list: ${src_list[0].text}`)
+
+        const min_idx = src_list[0].text === '..' ? 1 : 0
+        const path_arr = src_list[min_idx].href.split('/')
+        const basename = path_arr[path_arr.length - 1]
+        const b = basename.split('.')
+        console.log(`min_idx: ${min_idx},  ${src_list[0].text}`)
+        // http:, /, /, xxx
+        this.state = {
+          src_list: src_list,
+          basename: basename,
+          min_idx: min_idx,
+          idx: min_idx,
+          num_files: src_list.length - min_idx,
+          file_format: b[b.length - 1],
+        }
       }
-      const FilesCard = (props) => {
+
+      idxUpdate = (i) => {
+        const path_arr = this.state.src_list[i].href.split('/')
+        const basename = path_arr[path_arr.length - 1]
+        const b = basename.split('.')
+        this.setState({
+          idx: i,
+          basename: basename,
+          file_format: b[b.length - 1],
+        })
+      }
+
+      onClickNextButton = () => {
+        let idx = this.state.idx + 1
+        if (idx >= this.state.src_list.length) {
+          idx = this.state.min_idx
+        }
+        this.idxUpdate(idx)
+      }
+      onClickPrevButton = () => {
+        let idx = this.state.idx - 1
+        if (idx < this.state.min_idx) {
+          idx = this.state.src_list.length - 1
+        }
+        this.idxUpdate(idx)
+      }
+
+      mediaType = () => {
+        // component="video, audio, picture, iframe, or img".
+
+        const img_found = ['jpeg', 'jpg', 'png', 'webp', 'ico'].find(
+          (e) => e === this.state.file_format,
+        )
+        if (img_found) {
+          return 'img'
+        }
+
+        const video_found = ['mp4', 'wmv', 'mkv', 'webm'].find(
+          (e) => e === this.state.file_format,
+        )
+        if (video_found) {
+          return 'video'
+        }
+
+        const audio_found = ['mp3', 'wav'].find(
+          (e) => e === this.state.file_format,
+        )
+        if (audio_found) {
+          return 'audio'
+        }
+        return ''
+      }
+
+      render() {
         const {
           Card,
           CardMedia,
           Typography,
           CardContent,
-          ButtonGroup,
           Button,
           Chip,
           Stack,
         } = MaterialUI
+
         return (
           <Card>
             <CardContent>
               <Typography variant="h6">{directory}</Typography>
-              {files}
+              <Stack direction="row" spacing={2}>
+                <Chip
+                  label={`${this.state.idx + (1 - this.state.min_idx)}/${this.state.num_files}`}
+                  variant="outlined"
+                  color="info"
+                />
+                <Typography variant="h5">
+                  {decodeURI(this.state.basename)}
+                </Typography>
+              </Stack>
+            </CardContent>
+            <CardMedia
+              // sx={{ height: 140 }}
+              // maxHeight={400}
+              image={this.state.src_list[this.state.idx].href}
+              component={this.mediaType()}
+              title={this.state.src_list[this.state.idx].href}
+            />
+            <CardContent>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  variant="contained"
+                  onClick={this.onClickPrevButton}
+                  startIcon={<Icon icon="navigate_before" />}
+                  fullWidth
+                >
+                  Prev
+                </Button>
+                <Button
+                  variant="outlined"
+                  href={this.state.src_list[this.state.idx].href}
+                  fullWidth
+                >
+                  <Icon icon="file_open" />
+                  Open
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={this.onClickNextButton}
+                  endIcon={<Icon icon="navigate_next" />}
+                  fullWidth
+                >
+                  Next
+                </Button>
+              </Stack>
             </CardContent>
           </Card>
         )
       }
-      class PreviewCard extends React.Component {
-        constructor(props) {
-          super(props)
-          const src_list = files.querySelectorAll('a')
-          // console.log(`src_list: ${src_list[0].text}`)
+    }
 
-          const min_idx = src_list[0].text === '..'? 1 :0
-          const path_arr = src_list[min_idx].href.split('/')
-          const basename = path_arr[path_arr.length - 1]
-          const b = basename.split('.')
-          console.log(`min_idx: ${min_idx},  ${src_list[0].text}`)
-          // http:, /, /, xxx
-          this.state = {
-            src_list: src_list,
-            basename: basename,
-            min_idx:min_idx,
-            idx: min_idx,
-            num_files: src_list.length - min_idx,
-            file_format: b[b.length - 1],
-          }
-        }
-
-        idxUpdate = (i) => {
-          const path_arr = this.state.src_list[i].href.split('/')
-          const basename = path_arr[path_arr.length - 1]
-          const b = basename.split('.')
-          this.setState({
-            idx: i,
-            basename: basename,
-            file_format: b[b.length - 1],
-          })
-        }
-
-        onClickNextButton = () => {
-          let idx = this.state.idx + 1
-          if (idx >= this.state.src_list.length) {
-            idx = this.state.min_idx
-          }
-          this.idxUpdate(idx)
-        }
-        onClickPrevButton = () => {
-          let idx = this.state.idx - 1
-          if (idx < this.state.min_idx) {
-            idx = this.state.src_list.length - 1
-          }
-          this.idxUpdate(idx)
-        }
-
-        mediaType = () => {
-          // component="video, audio, picture, iframe, or img".
-
-          const img_found = ['jpeg', 'jpg', 'png', 'webp','ico'].find(
-            (e) => e === this.state.file_format,
-          )
-          if (img_found) {
-            return 'img'
-          }
-
-          const video_found = ['mp4', 'wmv', 'mkv', 'webm'].find(
-            (e) => e === this.state.file_format,
-          )
-          if (video_found) {
-            return 'video'
-          }
-
-          const audio_found = ['mp3', 'wav'].find(
-            (e) => e === this.state.file_format,
-          )
-          if (audio_found) {
-            return 'audio'
-          }
-          return ''
-        }
-
-        render() {
-          const {
-            Card,
-            CardMedia,
-            Typography,
-            CardContent,
-            ButtonGroup,
-            Button,
-            Chip,
-            Stack,
-          } = MaterialUI
-
-          return (
-            <Card>
-              <CardContent>
-                <Typography variant="h6">{directory}</Typography>
-                <Stack direction="row" spacing={2}>
-                  <Chip
-                    label={`${this.state.idx+(1-this.state.min_idx)}/${this.state.num_files}`}
-                    variant="outlined"
-                    color="info"
-                  />
-                  <Typography variant="h5">
-                    {decodeURI(this.state.basename)}
-                  </Typography>
-                </Stack>
-              </CardContent>
-              <CardMedia
-                // sx={{ height: 140 }}
-                image={this.state.src_list[this.state.idx].href}
-                component={this.mediaType()}
-                title={this.state.src_list[this.state.idx].href}
-              />
-              <CardContent>
-                <Stack direction="row" spacing={2}>
-                  <Button
-                    variant="contained"
-                    onClick={this.onClickPrevButton}
-                    startIcon={<Icon icon="navigate_before" />}
-                    fullWidth
-                  >
-                    Prev
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    href={this.state.src_list[this.state.idx].href}
-                    fullWidth
-                  >
-                    <Icon icon="file_open" />
-                    Open
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={this.onClickNextButton}
-                    endIcon={<Icon icon="navigate_next" />}
-                    fullWidth
-                  >
-                    Next
-                  </Button>
-                </Stack>
-              </CardContent>
-            </Card>
-          )
-        }
-      }
-
-      const MyApp = (props) => {
-        const { Card, Stack, Container } = MaterialUI
-        return (
-          <Container>
-            <Stack spacing={2}>
-              <PreviewCard />
-              <FilesCard />
-            </Stack>
-          </Container>
-        )
-      }
-
-      const DarkSwitch = () => {
-        const { createTheme, ThemeProvider, CssBaseline } = MaterialUI
-        const darkTheme = createTheme({
-          palette: {
-            mode: 'dark',
-          },
-        })
-        return (
-          <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
-          </ThemeProvider>
-        )
-      }
-      // ReactDOM.render(
-      //   <DarkSwitch />,
-      //   document.getElementsByClassName('dark-switch')[0],
-      // )
-      ReactDOM.render(
-        <FilesCard />,
-        document.getElementsByClassName('files-card')[0],
+    const MyApp = (props) => {
+      const { Card, Stack, Container } = MaterialUI
+      return (
+        <Container>
+          <Stack spacing={2}>
+            <PreviewCard />
+            <FilesCard />
+          </Stack>
+        </Container>
       )
-      ReactDOM.render(
-        <PreviewCard />,
-        document.getElementsByClassName('preview-card')[0],
+    }
+
+    const DarkSwitch = () => {
+      const { createTheme, ThemeProvider, CssBaseline } = MaterialUI
+      const darkTheme = createTheme({
+        palette: {
+          mode: 'dark',
+        },
+      })
+      return (
+        <ThemeProvider theme={darkTheme}>
+          <CssBaseline />
+        </ThemeProvider>
       )
-    </script>
-  </body>
+    }
+    // ReactDOM.render(
+    //   <DarkSwitch />,
+    //   document.getElementsByClassName('dark-switch')[0],
+    // )
+    ReactDOM.render(
+      <FilesCard />,
+      document.getElementsByClassName('files-card')[0],
+    )
+    ReactDOM.render(
+      <PreviewCard />,
+      document.getElementsByClassName('preview-card')[0],
+    )
+  </script>
+</body>
+
 </html>
