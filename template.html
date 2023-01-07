@@ -27,15 +27,9 @@
 
 <body class="directory">
   <div class="myapp">
-    <div class="dark-switch"></div>
+    <!-- <div class="dark-switch"></div> -->
     <div class="preview-card"></div>
     <div class="files-card"></div>
-    <!-- <div>
-        <h3>
-          {linked-path}
-        </h3>
-        {files}
-      </div> -->
   </div>
   <script type="text/babel">
     'use strict'
@@ -43,7 +37,37 @@
       return <span class="material-symbols-outlined">{props.icon}</span>
     }
 
+    const useWindowSize = () => {
+      const [size, setSize] = React.useState([0, 0]);
+      React.useLayoutEffect(() => {
+        const updateSize = () => {
+          setSize([window.innerWidth, window.innerHeight]);
+        };
+
+        window.addEventListener('resize', updateSize);
+        updateSize();
+
+        return () => window.removeEventListener('resize', updateSize);
+      }, []);
+      // console.log(`window-size: ${size}`)
+      return size;
+    };
+    const GetWindowSizeComponent = () => {
+      const [width, height] = useWindowSize();
+
+      return (
+        <span>
+          {`${width} x ${height}`}
+        </span>
+      );
+    };
+
     const FilesCard = (props) => {
+
+      // list of href
+      // list of text
+
+
       const {
         Card,
         CardMedia,
@@ -67,8 +91,13 @@
     class PreviewCard extends React.Component {
       constructor(props) {
         super(props)
+        window.addEventListener('resize', this.updateWindowSize);
+
         const src_list = files.querySelectorAll('a')
-        // console.log(`src_list: ${src_list[0].text}`)
+
+        console.log(`name: ${src_list[0].querySelector('.name').innerText}`)
+        console.log(`size: ${src_list[0].querySelector('.size').innerText}`)
+        console.log(`date: ${src_list[0].querySelector('.date').innerText}`)
 
         const min_idx = src_list[0].text === '..' ? 1 : 0
         const path_arr = src_list[min_idx].href.split('/')
@@ -84,8 +113,16 @@
           idx: min_idx,
           num_files: src_list.length - min_idx,
           file_format: b[b.length - 1],
+          window_size: [window.innerWidth, window.innerHeight]
         }
       }
+
+      updateWindowSize = () => {
+        this.setState(
+          { window_size: [window.innerWidth, window.innerHeight] }
+        );
+      }
+
 
       previewSrc = () => {
         if (this.mediaType() === "img") {
@@ -95,6 +132,8 @@
         }
 
       }
+
+
 
       idxUpdate = (i) => {
         const path_arr = this.state.src_list[i].href.split('/')
@@ -166,9 +205,10 @@
           Stack,
           Grid,
         } = MaterialUI
-
+        // const [width, height] = useWindowSize();
+        console.log(` window.innerHeight: ${this.state.window_size[1]}`)
         return (
-          <Card>
+          <Card >
             <CardContent>
               <Typography variant="h6">{directory}</Typography>
               <Stack direction="row" spacing={2}>
@@ -182,33 +222,13 @@
                 </Typography>
               </Stack>
             </CardContent>
-            <CardContent>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={1} sx={{ height: '100%' }}>
-                  <Button
-                    variant="outlined"
-                    onClick={this.onClickPrevButton}
-                    fullWidth
-                  >
-                    <Icon icon="navigate_before" />
-                  </Button></Grid>
-                <Grid item xs={10}>
-                  <CardMedia
-                    sx={{ maxHeight: 600, objectFit: "scale-down" }}
-                    src={this.previewSrc()}
-                    component='img'
-                    title={this.state.src_list[this.state.idx].href}
-                  /></Grid>
-                <Grid item xs={1}>
-                  <Button
-                    variant="outlined"
-                    onClick={this.onClickNextButton}
-                    fullWidth
-                  >
-                    <Icon icon="navigate_next" />
-                  </Button></Grid>
-              </Grid>
-            </CardContent>
+
+            <CardMedia
+              sx={{ maxHeight: 0.6 * this.state.window_size[1], objectFit: "scale-down" }}
+              src={this.state.src_list[this.state.idx].href}
+              component={this.mediaType()}
+              title={this.state.src_list[this.state.idx].href}
+            />
             <CardContent>
               <Stack direction="row" spacing={2}>
                 <Button
@@ -273,11 +293,11 @@
     // )
     ReactDOM.render(
       <FilesCard />,
-      document.getElementsByClassName('files-card')[0],
+      document.querySelector('.files-card'),
     )
     ReactDOM.render(
       <PreviewCard />,
-      document.getElementsByClassName('preview-card')[0],
+      document.querySelector('.preview-card'),
     )
   </script>
 </body>
