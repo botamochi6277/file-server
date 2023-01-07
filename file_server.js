@@ -1,8 +1,20 @@
 'use strict';
 const express = require('express');
 const os = require("os");
+const yargs = require("yargs");
 // import { networkInterfaces } from "os";
 
+const argv = yargs
+  .command('path', 'target directory path')
+  .demandCommand(1)
+  .option('port', {
+    alias: 'p',
+    description: 'port number',
+    demandOption: true,
+    default: 8002
+  })
+  .help()
+  .argv
 
 function getIpAddress() {
   const nets = os.networkInterfaces();
@@ -13,8 +25,8 @@ function getIpAddress() {
 const host = getIpAddress();
 
 const app = express();
-const args = process.argv.slice(2);
-const rootPath = args[0];
+// const args = process.argv.slice(2);
+const rootPath = argv._[0];
 app.use(express.static(rootPath, { index: false }));
 
 //index.htmlを勝手に見に行かない指定
