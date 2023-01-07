@@ -78,15 +78,20 @@
         constructor(props) {
           super(props)
           const src_list = files.querySelectorAll('a')
-          const path_arr = src_list[1].href.split('/')
+          // console.log(`src_list: ${src_list[0].text}`)
+
+          const min_idx = src_list[0].text === '..'? 1 :0
+          const path_arr = src_list[min_idx].href.split('/')
           const basename = path_arr[path_arr.length - 1]
           const b = basename.split('.')
+          console.log(`min_idx: ${min_idx},  ${src_list[0].text}`)
           // http:, /, /, xxx
           this.state = {
             src_list: src_list,
             basename: basename,
-            idx: 1,
-            num_files: src_list.length - 1,
+            min_idx:min_idx,
+            idx: min_idx,
+            num_files: src_list.length - min_idx,
             file_format: b[b.length - 1],
           }
         }
@@ -105,13 +110,13 @@
         onClickNextButton = () => {
           let idx = this.state.idx + 1
           if (idx >= this.state.src_list.length) {
-            idx = 1
+            idx = this.state.min_idx
           }
           this.idxUpdate(idx)
         }
         onClickPrevButton = () => {
           let idx = this.state.idx - 1
-          if (idx <= 1) {
+          if (idx < this.state.min_idx) {
             idx = this.state.src_list.length - 1
           }
           this.idxUpdate(idx)
@@ -120,7 +125,7 @@
         mediaType = () => {
           // component="video, audio, picture, iframe, or img".
 
-          const img_found = ['jpeg', 'jpg', 'png', 'webp'].find(
+          const img_found = ['jpeg', 'jpg', 'png', 'webp','ico'].find(
             (e) => e === this.state.file_format,
           )
           if (img_found) {
@@ -161,7 +166,7 @@
                 <Typography variant="h6">{directory}</Typography>
                 <Stack direction="row" spacing={2}>
                   <Chip
-                    label={`${this.state.idx}/${this.state.num_files}`}
+                    label={`${this.state.idx+(1-this.state.min_idx)}/${this.state.num_files}`}
                     variant="outlined"
                     color="info"
                   />
