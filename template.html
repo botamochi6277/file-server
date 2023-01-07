@@ -286,7 +286,8 @@
           Stack,
           Grid,
           CardHeader,
-          Avatar
+          Avatar,
+          Badge
         } = MaterialUI
         // const [width, height] = useWindowSize();
         // console.log(` window.innerHeight: ${this.state.window_size[1]}`)
@@ -294,10 +295,12 @@
           <Card >
             <CardHeader
               avatar={
-                <Avatar sx={{ bgcolor: 'secondary' }} aria-label="recipe">
-                  {`${this.state.idx + (1 - this.state.min_idx)}`}
-                </Avatar>
-
+                <Badge
+                  badgeContent={`${this.state.idx + (1 - this.state.min_idx)}/${this.state.num_files}`}
+                  color="secondary">
+                  <Avatar variant='primary' aria-label="recipe">
+                    <MediaIcon file_format={this.state.file_format} />
+                  </Avatar></Badge>
               }
               title='{directory}'
               subheader={decodeURI(this.state.basename)}
