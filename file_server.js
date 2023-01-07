@@ -4,7 +4,7 @@ const os = require("os");
 const yargs = require("yargs");
 // import { networkInterfaces } from "os";
 
-const argv = yargs
+const args = yargs
   .command('path', 'target directory path')
   .demandCommand(1)
   .option('port', {
@@ -26,7 +26,7 @@ const host = getIpAddress();
 
 const app = express();
 // const args = process.argv.slice(2);
-const rootPath = argv._[0];
+const rootPath = args._[0];
 app.use(express.static(rootPath, { index: false }));
 
 //index.htmlを勝手に見に行かない指定
@@ -40,7 +40,7 @@ app.use(serveIndex(rootPath, {
 }));
 
 const hostname = os.hostname();
-const port = 8002
+const port = args.port
 app.listen(port, () => {
   console.log(`File Server for ${rootPath}`);
   console.log(`Please access http://${hostname}:${port}`);
