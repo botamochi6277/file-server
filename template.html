@@ -74,7 +74,8 @@
         const path_arr = src_list[min_idx].href.split('/')
         const basename = path_arr[path_arr.length - 1]
         const b = basename.split('.')
-        console.log(`min_idx: ${min_idx},  ${src_list[0].text}`)
+        // console.log(`min_idx: ${min_idx},  ${src_list[0].text}`)
+        const preview_src = ''
         // http:, /, /, xxx
         this.state = {
           src_list: src_list,
@@ -84,6 +85,15 @@
           num_files: src_list.length - min_idx,
           file_format: b[b.length - 1],
         }
+      }
+
+      previewSrc = () => {
+        if (this.mediaType() === "img") {
+          return this.state.src_list[this.state.idx].href
+        } else {
+          return `https://dummyimage.com/600x100/a0a0a0/f7f7f7.png&text=${this.state.basename}`
+        }
+
       }
 
       idxUpdate = (i) => {
@@ -174,29 +184,29 @@
             </CardContent>
             <CardContent>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={1} sx={{height:'100%'}}>
-                <Button
-                  variant="outlined"
-                  onClick={this.onClickPrevButton}
-                  fullWidth
-                >
-                  <Icon icon="navigate_before" />
-                </Button></Grid>
+                <Grid item xs={1} sx={{ height: '100%' }}>
+                  <Button
+                    variant="outlined"
+                    onClick={this.onClickPrevButton}
+                    fullWidth
+                  >
+                    <Icon icon="navigate_before" />
+                  </Button></Grid>
                 <Grid item xs={10}>
-                <CardMedia
-                  sx={{ maxHeight: 600,  objectFit: "scale-down" }}
-                  src={this.state.src_list[this.state.idx].href}
-                  component={this.mediaType()}
-                  title={this.state.src_list[this.state.idx].href}
-                /></Grid>
+                  <CardMedia
+                    sx={{ maxHeight: 600, objectFit: "scale-down" }}
+                    src={this.previewSrc()}
+                    component='img'
+                    title={this.state.src_list[this.state.idx].href}
+                  /></Grid>
                 <Grid item xs={1}>
-                <Button
-                  variant="outlined"
-                  onClick={this.onClickNextButton}
-                  fullWidth
-                >
-                  <Icon icon="navigate_next" />
-                </Button></Grid>
+                  <Button
+                    variant="outlined"
+                    onClick={this.onClickNextButton}
+                    fullWidth
+                  >
+                    <Icon icon="navigate_next" />
+                  </Button></Grid>
               </Grid>
             </CardContent>
             <CardContent>
