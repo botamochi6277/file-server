@@ -204,27 +204,26 @@
           Chip,
           Stack,
           Grid,
+          CardHeader,
+          Avatar
         } = MaterialUI
         // const [width, height] = useWindowSize();
         console.log(` window.innerHeight: ${this.state.window_size[1]}`)
         return (
           <Card >
-            <CardContent>
-              <Typography variant="h6">{directory}</Typography>
-              <Stack direction="row" spacing={2}>
-                <Chip
-                  label={`${this.state.idx + (1 - this.state.min_idx)}/${this.state.num_files}`}
-                  variant="outlined"
-                  color="info"
-                />
-                <Typography variant="h5">
-                  {decodeURI(this.state.basename)}
-                </Typography>
-              </Stack>
-            </CardContent>
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: 'secondary' }} aria-label="recipe">
+                  {`${this.state.idx + (1 - this.state.min_idx)}/${this.state.num_files}`}
+                </Avatar>
+
+              }
+              title='{directory}'
+              subheader={decodeURI(this.state.basename)}
+            />
 
             <CardMedia
-              sx={{ maxHeight: 0.6 * this.state.window_size[1], objectFit: "scale-down" }}
+              sx={{ maxHeight: 0.8 * this.state.window_size[1], objectFit: "scale-down" }}
               src={this.state.src_list[this.state.idx].href}
               component={this.mediaType()}
               title={this.state.src_list[this.state.idx].href}
