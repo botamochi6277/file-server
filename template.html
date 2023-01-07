@@ -33,19 +33,18 @@
     'use strict'
 
     const parsePath = (s) => {
-      const path_arr = s.href.split('/')
+      const path_arr = s.split('/')
       const basename = path_arr[path_arr.length - 1]
       const b = basename.split('.')
       return ({
         dirname: path_arr.length === 1 ? '' : path_arr[path_arr.length - 2],
         basename: basename,
-        file_format: b[b.length - 1],
+        file_format: (b.length === 1 || s === '..') ? 'folder' : b[b.length - 1],
       })
     }
 
     const mediaType = (file_format) => {
       // component="video, audio, picture, iframe, or img".
-
       const img_found = ['jpeg', 'jpg', 'png', 'webp', 'ico'].find(
         (e) => e === file_format,
       )
@@ -66,7 +65,7 @@
       if (audio_found) {
         return 'audio'
       }
-      const txt_found = ['md', 'txt', 'py'].find(
+      const txt_found = ['md', 'txt'].find(
         (e) => e === file_format,
       )
       if (txt_found) {
@@ -80,8 +79,28 @@
       return <span class="material-symbols-outlined">{props.icon}</span>
     }
 
-    const FileIcon = (props) => {
-      const file = props.file
+    const MediaIcon = (props) => {
+
+      if (props.file_format === 'folder') {
+        return (<Icon icon='folder' />)
+      }
+      const media = mediaType(props.file_format)
+
+      if (media === 'img') {
+        return (<Icon icon='image' />)
+      }
+      if (media === 'video') {
+        return (<Icon icon='movie' />)
+      }
+      if (media === 'iframe') {
+        return (<Icon icon='article' />)
+      }
+
+      if (media === 'audio') {
+        return (<Icon icon='music' />)
+      }
+
+      return (<Icon icon='file_open' />)
     }
 
     const useWindowSize = () => {
@@ -144,20 +163,22 @@
         TableCell,
         Paper
       } = MaterialUI
-      const items = file_items.map(f => (
-        <TableRow
-          key={f.name}
-          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-        >
-          <TableCell component="th" scope="row" align="center">
-            <Icon icon='file_open' />
-          </TableCell>
-          <TableCell align="left">
-            <Link href={f.href}>{f.name}</Link> </TableCell>
-          <TableCell align="right">{f.size}</TableCell>
-          <TableCell align="left">{f.date}</TableCell>
-        </TableRow>
-      ));
+      const items = file_items.map(f => {
+        return (
+          <TableRow
+            key={f.name}
+            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+          >
+            <TableCell component="th" scope="row" align="center">
+              <MediaIcon file_format={parsePath(f.name).file_format} />
+            </TableCell>
+            <TableCell align="left">
+              <Link href={f.href}>{f.name}</Link> </TableCell>
+            <TableCell align="right">{f.size}</TableCell>
+            <TableCell align="left">{f.date}</TableCell>
+          </TableRow>
+        )
+      });
 
 
       return (
@@ -228,7 +249,7 @@
 
 
       idxUpdate = (i) => {
-        const p = parsePath(this.state.src_list[i])
+        const p = parsePath(this.state.src_list[i].href)
         this.setState({
           idx: i,
           basename: p.basename,
