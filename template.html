@@ -16,8 +16,6 @@
       crossorigin="anonymous"
     ></script> -->
   <style>
-    {style}
-
     .MuiCard-root {
       margin: 1em;
     }
@@ -64,10 +62,22 @@
 
     const FilesCard = (props) => {
 
-      // list of href
-      // list of text
+      const strhtml = `{files}`
+      const parser = new DOMParser();
+      const file_doc = parser.parseFromString(strhtml, 'text/html');
+      const src_list = Array.from(file_doc.querySelectorAll('a'));
 
-
+      const file_items = src_list.map(
+        (a) => {
+          return {
+            name: a.querySelector('.name').innerText,
+            href: a.href,
+            size: a.querySelector('.size').innerText,
+            date: a.querySelector('.date').innerText
+          }
+        }
+      );
+      console.log(`file: ${file_items[2].name},  ${file_items[2].href}`)
       const {
         Card,
         CardMedia,
@@ -77,12 +87,56 @@
         Button,
         Chip,
         Stack,
+        List,
+        ListItem,
+        ListItemIcon,
+        ListItemText,
+        ListItemButton,
+        Link,
+        ListItemAvatar,
+        Avatar,
+        TableContainer,
+        Table,
+        TableHead,
+        TableRow,
+        TableBody,
+        TableCell,
+        Paper
       } = MaterialUI
+      const items = file_items.map(f => (
+        <TableRow
+          key={f.name}
+          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+        >
+          <TableCell component="th" scope="row" align="center">
+            <Icon icon='file_open' />
+          </TableCell>
+          <TableCell align="left">
+            <Link href={f.href}>{f.name}</Link> </TableCell>
+          <TableCell align="right">{f.size}</TableCell>
+          <TableCell align="left">{f.date}</TableCell>
+        </TableRow>
+      ));
+
+
       return (
         <Card>
           <CardContent>
-            <Typography variant="h6">{directory}</Typography>
-            {files}
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">Icon</TableCell>
+                    <TableCell align="left">Name</TableCell>
+                    <TableCell align="right">Size</TableCell>
+                    <TableCell align="left">Date</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {items}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </CardContent>
         </Card>
       )
@@ -92,20 +146,18 @@
       constructor(props) {
         super(props)
         window.addEventListener('resize', this.updateWindowSize);
-
-        const src_list = files.querySelectorAll('a')
-
-        console.log(`name: ${src_list[0].querySelector('.name').innerText}`)
-        console.log(`size: ${src_list[0].querySelector('.size').innerText}`)
-        console.log(`date: ${src_list[0].querySelector('.date').innerText}`)
-
+        const strhtml = `{files}`
+        const parser = new DOMParser();
+        const file_doc = parser.parseFromString(strhtml, 'text/html');
+        // const src_list = Array.from(file_doc.querySelectorAll('a'));
+        const src_list = file_doc.querySelectorAll('a')
+        console.log(src_list[0])
         const min_idx = src_list[0].text === '..' ? 1 : 0
+        // http:, /, /, xxx
         const path_arr = src_list[min_idx].href.split('/')
         const basename = path_arr[path_arr.length - 1]
         const b = basename.split('.')
-        // console.log(`min_idx: ${min_idx},  ${src_list[0].text}`)
         const preview_src = ''
-        // http:, /, /, xxx
         this.state = {
           src_list: src_list,
           basename: basename,
@@ -208,13 +260,13 @@
           Avatar
         } = MaterialUI
         // const [width, height] = useWindowSize();
-        console.log(` window.innerHeight: ${this.state.window_size[1]}`)
+        // console.log(` window.innerHeight: ${this.state.window_size[1]}`)
         return (
           <Card >
             <CardHeader
               avatar={
                 <Avatar sx={{ bgcolor: 'secondary' }} aria-label="recipe">
-                  {`${this.state.idx + (1 - this.state.min_idx)}/${this.state.num_files}`}
+                  {`${this.state.idx + (1 - this.state.min_idx)}`}
                 </Avatar>
 
               }
