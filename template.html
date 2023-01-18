@@ -304,6 +304,11 @@
               }
               title='{directory}'
               subheader={decodeURI(this.state.basename)}
+              action={
+                <IconButton aria-label="settings" href={this.state.src_list[0].href}>
+                  <Icon icon="drive_folder_upload" />
+                </IconButton>
+              }
             />
 
             <CardMedia
