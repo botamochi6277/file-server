@@ -25,7 +25,7 @@
 
 <body class="directory">
   <div class="myapp">
-    <!-- <div class="dark-switch"></div> -->
+    <div class="dark-switch"></div>
     <div class="preview-card"></div>
     <div class="files-card"></div>
   </div>
@@ -148,13 +148,9 @@
       console.log(`file: ${file_items[2].name},  ${file_items[2].href}`)
       const {
         Card,
-        CardMedia,
         Typography,
         CardContent,
-        Chip,
-        Stack,
         Link,
-        Avatar,
         TableContainer,
         Table,
         TableHead,
@@ -184,21 +180,19 @@
       return (
         <Card>
           <CardContent>
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">Icon</TableCell>
-                    <TableCell align="left">Name</TableCell>
-                    <TableCell align="right">Size</TableCell>
-                    <TableCell align="left">Date</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {items}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <Table sx={{ minWidth: 650 }} size="small" aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">Icon</TableCell>
+                  <TableCell align="left">Name</TableCell>
+                  <TableCell align="right">Size</TableCell>
+                  <TableCell align="left">Date</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       )
@@ -292,7 +286,7 @@
         // const [width, height] = useWindowSize();
         // console.log(` window.innerHeight: ${this.state.window_size[1]}`)
         return (
-          <Card >
+          <Card>
             <CardHeader
               avatar={
                 <Badge
@@ -353,14 +347,22 @@
     }
 
     const MyApp = (props) => {
-      const { Card, Stack, Container } = MaterialUI
+      const { Card, Stack, Container, createTheme, ThemeProvider, CssBaseline } = MaterialUI
+      const dark_theme = createTheme({
+        palette: {
+          mode: 'dark',
+        },
+      })
       return (
-        <Container>
-          <Stack spacing={2}>
-            <PreviewCard />
-            <FilesCard />
-          </Stack>
-        </Container>
+        <ThemeProvider theme={dark_theme}>
+          <CssBaseline />
+          <Container>
+            <Stack spacing={2}>
+              <PreviewCard />
+              <FilesCard />
+            </Stack>
+          </Container>
+        </ThemeProvider>
       )
     }
 
@@ -381,13 +383,19 @@
     //   <DarkSwitch />,
     //   document.getElementsByClassName('dark-switch')[0],
     // )
+
+    // ReactDOM.render(
+    //   <FilesCard />,
+    //   document.querySelector('.files-card'),
+    // )
+    // ReactDOM.render(
+    //   <PreviewCard />,
+    //   document.querySelector('.preview-card'),
+    // )
+
     ReactDOM.render(
-      <FilesCard />,
-      document.querySelector('.files-card'),
-    )
-    ReactDOM.render(
-      <PreviewCard />,
-      document.querySelector('.preview-card'),
+      <MyApp />,
+      document.querySelector('.myapp'),
     )
   </script>
 </body>
