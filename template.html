@@ -145,7 +145,7 @@
           }
         }
       );
-      console.log(`file: ${file_items[2].name},  ${file_items[2].href}`)
+      // console.log(`file: ${file_items[2].name},  ${file_items[2].href}`)
       const {
         Card,
         Typography,
@@ -347,51 +347,56 @@
     }
 
     const MyApp = (props) => {
-      const { Card, Stack, Container, createTheme, ThemeProvider, CssBaseline } = MaterialUI
-      const dark_theme = createTheme({
-        palette: {
-          mode: 'dark',
-        },
-      })
+      const { Card, Stack, Container, createTheme, ThemeProvider, CssBaseline, Button } = MaterialUI
+      const [theme, setTheme] = React.useState(
+        createTheme({
+          palette: {
+            mode: 'dark',
+          },
+        })
+      );
+
+      const toggleTheme = (theme) => {
+        if (theme.palette.mode === 'dark') {
+          setTheme(
+            createTheme({
+              palette: {
+                mode: 'light',
+              },
+            })
+          )
+        } else {
+          setTheme(
+            createTheme({
+              palette: {
+                mode: 'dark',
+              },
+            })
+          )
+        }
+      }
+
       return (
-        <ThemeProvider theme={dark_theme}>
+        <ThemeProvider theme={theme}>
           <CssBaseline />
           <Container>
-            <Stack spacing={2}>
-              <PreviewCard />
-              <FilesCard />
-            </Stack>
+            <PreviewCard />
+            <FilesCard />
+            <Button
+              startIcon={theme.palette.mode === 'dark' ? <Icon icon="brightness_7" /> : <Icon icon="brightness_4" />}
+              variant="outlined"
+              color="secondary"
+              onClick={() => toggleTheme(theme)}
+              fullWidth
+            >
+              {theme.palette.mode} mode
+            </Button>
           </Container>
         </ThemeProvider>
       )
     }
 
-    const DarkSwitch = () => {
-      const { createTheme, ThemeProvider, CssBaseline } = MaterialUI
-      const darkTheme = createTheme({
-        palette: {
-          mode: 'dark',
-        },
-      })
-      return (
-        <ThemeProvider theme={darkTheme}>
-          <CssBaseline />
-        </ThemeProvider>
-      )
-    }
-    // ReactDOM.render(
-    //   <DarkSwitch />,
-    //   document.getElementsByClassName('dark-switch')[0],
-    // )
 
-    // ReactDOM.render(
-    //   <FilesCard />,
-    //   document.querySelector('.files-card'),
-    // )
-    // ReactDOM.render(
-    //   <PreviewCard />,
-    //   document.querySelector('.preview-card'),
-    // )
 
     ReactDOM.render(
       <MyApp />,
