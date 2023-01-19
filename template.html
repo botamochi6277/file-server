@@ -39,7 +39,7 @@
       return ({
         dirname: path_arr.length === 1 ? '' : path_arr[path_arr.length - 2],
         basename: basename,
-        file_format: (b.length === 1 || s === '..') ? 'folder' : b[b.length - 1],
+        file_format: (b.length === 1 || s === '..') ? 'folder' : b[b.length - 1].length < 8 ? [b.length - 1] : 'folder',
       })
     }
 
