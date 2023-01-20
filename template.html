@@ -135,7 +135,7 @@
       const file_doc = parser.parseFromString(strhtml, 'text/html');
       const src_list = Array.from(file_doc.querySelectorAll('a'));
 
-      const filesize = (size) => {
+      const filesizeFormat = (size) => {
         if (size === "") {
           return ""
         }
@@ -152,12 +152,20 @@
         return `${number_size} B`
       }
 
+      const filenameFormat = (name) => {
+        const max_length = 64;
+        if (name.length <= max_length) {
+          return name;
+        }
+        return `${name.slice(0, 30)}...${name.slice(-30)}`
+      }
+
       const file_items = src_list.map(
         (a) => {
           return {
-            name: a.querySelector('.name').innerText,
+            name: filenameFormat(a.querySelector('.name').innerText),
             href: a.href,
-            size: filesize(a.querySelector('.size').innerText),
+            size: filesizeFormat(a.querySelector('.size').innerText),
             date: a.querySelector('.date').innerText
           }
         }
