@@ -39,7 +39,7 @@
       return ({
         dirname: path_arr.length === 1 ? '' : path_arr[path_arr.length - 2],
         basename: basename,
-        file_format: (b.length === 1 || s === '..') ? 'folder' : b[b.length - 1].length < 8 ? [b.length - 1] : 'folder',
+        file_format: (b.length === 1 || s === '..') ? 'folder' : b[b.length - 1].length < 8 ? b[b.length - 1] : 'folder',
       })
     }
 
@@ -135,12 +135,29 @@
       const file_doc = parser.parseFromString(strhtml, 'text/html');
       const src_list = Array.from(file_doc.querySelectorAll('a'));
 
+      const filesize = (size) => {
+        if (size === "") {
+          return ""
+        }
+        const number_size = Number(size);
+        if (number_size > 1e9) {
+          return `${(number_size / 1e9).toFixed(2)} GB`
+        }
+        if (number_size > 1e6) {
+          return `${(number_size / 1e6).toFixed(2)} MB`
+        }
+        if (number_size > 1e3) {
+          return `${(number_size / 1e3).toFixed(2)} KB`
+        }
+        return `${number_size} B`
+      }
+
       const file_items = src_list.map(
         (a) => {
           return {
             name: a.querySelector('.name').innerText,
             href: a.href,
-            size: a.querySelector('.size').innerText,
+            size: filesize(a.querySelector('.size').innerText),
             date: a.querySelector('.date').innerText
           }
         }
@@ -151,12 +168,7 @@
         Typography,
         CardContent,
         Link,
-        TableContainer,
-        Table,
-        TableHead,
-        TableRow,
-        TableBody,
-        TableCell,
+        TableContainer, Table, TableHead, TableRow, TableBody, TableCell,
         Paper
       } = MaterialUI
       const items = file_items.map(f => {
@@ -270,18 +282,9 @@
 
       render() {
         const {
-          Card,
-          CardMedia,
           Typography,
-          CardContent,
-          Button,
-          IconButton,
-          Chip,
-          Stack,
-          Grid,
-          CardHeader,
-          Avatar,
-          Badge
+          Card, CardMedia, CardHeader, CardContent,
+          Button, IconButton, Chip, Stack, Avatar, Badge
         } = MaterialUI
         // const [width, height] = useWindowSize();
         // console.log(` window.innerHeight: ${this.state.window_size[1]}`)
@@ -310,8 +313,8 @@
               src={this.state.src_list[this.state.idx].href}
               component={mediaType(this.state.file_format)}
               title={this.state.src_list[this.state.idx].href}
-              autoPlay
-              loop
+            // autoPlay
+            // loop
             />
             <CardContent>
               <Stack direction="row" spacing={2}>
