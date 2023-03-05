@@ -45,7 +45,7 @@
 
     const mediaType = (file_format) => {
       // component="video, audio, picture, iframe, or img".
-      const img_found = ['jpeg', 'jpg', 'png', 'webp', 'ico'].find(
+      const img_found = ['jpeg', 'jpg', 'png', 'webp', 'ico', 'gif', 'heic'].find(
         (e) => e === file_format,
       )
       if (img_found) {
@@ -97,7 +97,7 @@
       }
 
       if (media === 'audio') {
-        return (<Icon icon='music' />)
+        return (<Icon icon='audio_file' />)
       }
 
       return (<Icon icon='file_open' />)
