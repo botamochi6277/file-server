@@ -130,10 +130,7 @@
 
     const FilesCard = (props) => {
 
-      const strhtml = `{files}`
-      const parser = new DOMParser();
-      const file_doc = parser.parseFromString(strhtml, 'text/html');
-      const src_list = Array.from(file_doc.querySelectorAll('a'));
+      const src_list = props.sources;
 
       const filesizeFormat = (size) => {
         if (size === "") {
@@ -163,10 +160,10 @@
       const file_items = src_list.map(
         (a) => {
           return {
-            name: filenameFormat(a.querySelector('.name').innerText),
+            name: a.name,
             href: a.href,
-            size: filesizeFormat(a.querySelector('.size').innerText),
-            date: a.querySelector('.date').innerText
+            size: a.size,
+            date: a.date
           }
         }
       );
@@ -222,15 +219,12 @@
       constructor(props) {
         super(props)
         window.addEventListener('resize', this.updateWindowSize);
-        const strhtml = `{files}`
-        const parser = new DOMParser();
-        const file_doc = parser.parseFromString(strhtml, 'text/html');
-        // const src_list = Array.from(file_doc.querySelectorAll('a'));
-        const src_list = file_doc.querySelectorAll('a')
-        console.log(src_list[0])
-        const min_idx = src_list[0].text === '..' ? 1 : 0
+
+        const src_list = props.sources;
+        const min_idx = src_list[0].title === '..' ? 1 : 0
         // http:, /, /, xxx
-        const path_arr = src_list[min_idx].href.split('/')
+
+        const path_arr = src_list[min_idx].href.split('/')//array of path
         const basename = path_arr[path_arr.length - 1]
         const b = basename.split('.')
         const preview_src = ''
@@ -238,7 +232,7 @@
           src_list: src_list,
           basename: basename,
           min_idx: min_idx,
-          idx: min_idx,
+          idx: min_idx,//initial index
           num_files: src_list.length - min_idx,
           file_format: b[b.length - 1],
           window_size: [window.innerWidth, window.innerHeight]
@@ -260,7 +254,6 @@
         }
 
       }
-
 
       idxUpdate = (i) => {
         const p = parsePath(this.state.src_list[i].href)
@@ -292,7 +285,7 @@
         const {
           Typography,
           Card, CardMedia, CardHeader, CardContent,
-          Button, IconButton, Chip, Stack, Avatar, Badge
+          Button, IconButton, Chip, Stack, Avatar, Badge, Backdrop
         } = MaterialUI
         // const [width, height] = useWindowSize();
         // console.log(` window.innerHeight: ${this.state.window_size[1]}`)
@@ -323,7 +316,9 @@
               title={this.state.src_list[this.state.idx].href}
             // autoPlay
             // loop
+            // https://mui.com/material-ui/react-stepper/
             />
+
             <CardContent>
               <Stack direction="row" spacing={2}>
                 <Button
@@ -387,12 +382,46 @@
         }
       }
 
+      const str_html = `{files}`
+      const dom_parser = new DOMParser();
+      const file_doc = dom_parser.parseFromString(str_html, 'text/html');
+      const src_list = Array.from(file_doc.querySelectorAll('a'));
+      console.debug(src_list);
+
+      const sources = src_list.map((a) => (
+        {
+          title: a.title,
+          href: a.href,
+          size: a.querySelector('.size').innerText,
+          name: a.querySelector('.name').innerText,
+          date: a.querySelector('.date').innerText,
+          dirname: parsePath(a.href).dirname,
+          file_format: parsePath(a.href).file_format
+        }
+      ));
+
+      const sorted_sources = sources.sort((a, b) => {
+        const a1 = parseInt(a.title.replace(/[^0-9]/g, ''), 10);
+        const b1 = parseInt(b.title.replace(/[^0-9]/g, ''), 10);
+        const a2 = (a1 !== a1) ? 0 : a1;
+        const b2 = (b1 !== b1) ? 0 : b1;
+
+        if (a2 > b2) {
+          return 1;
+        } else if (a2 < b2) {
+          return -1;
+        }
+        return a.title < b.title
+      });
+      console.debug(sorted_sources);
+
+
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Container>
-            <PreviewCard />
-            <FilesCard />
+            <PreviewCard sources={sorted_sources} />
+            <FilesCard sources={sorted_sources} />
             <Button
               startIcon={theme.palette.mode === 'dark' ? <Icon icon="brightness_7" /> : <Icon icon="brightness_4" />}
               variant="outlined"
