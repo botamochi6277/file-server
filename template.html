@@ -162,12 +162,12 @@
           return {
             name: a.name,
             href: a.href,
-            size: a.size,
+            size: filesizeFormat(a.size),
             date: a.date
           }
         }
       );
-      // console.log(`file: ${file_items[2].name},  ${file_items[2].href}`)
+
       const {
         Card,
         Typography,
@@ -386,7 +386,7 @@
       const dom_parser = new DOMParser();
       const file_doc = dom_parser.parseFromString(str_html, 'text/html');
       const src_list = Array.from(file_doc.querySelectorAll('a'));
-      console.debug(src_list);
+      // console.debug(src_list);
 
       const sources = src_list.map((a) => (
         {
@@ -400,7 +400,7 @@
         }
       ));
 
-      const sorted_sources = sources.sort((a, b) => {
+      const sorted_sources = [sources[0]].concat(sources.slice(1, sources.length).sort((a, b) => {
         const a1 = parseInt(a.title.replace(/[^0-9]/g, ''), 10);
         const b1 = parseInt(b.title.replace(/[^0-9]/g, ''), 10);
         const a2 = (a1 !== a1) ? 0 : a1;
@@ -412,7 +412,7 @@
           return -1;
         }
         return a.title < b.title
-      });
+      }));
       console.debug(sorted_sources);
 
 
