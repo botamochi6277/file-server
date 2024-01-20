@@ -2,7 +2,7 @@
 const express = require('express');
 const os = require("os");
 const yargs = require("yargs");
-// import { networkInterfaces } from "os";
+const cors = require('cors');
 
 const args = yargs
   .command('path', 'target directory path')
@@ -31,6 +31,7 @@ function getIpAddress() {
 const host = getIpAddress();
 
 const app = express();
+app.use(cors())
 const rootPath = args._[0];
 app.use(express.static(rootPath, { index: false }));
 
