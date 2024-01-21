@@ -7,9 +7,7 @@
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
   <!-- <script
       src="https://cdn.jsdelivr.net/npm/@acidic9/pure-react-carousel@0.0.0-semantically-released/dist/index.cjs.min.js"
@@ -126,7 +124,7 @@
       );
     };
 
-    const FileRadioCard = (props) => {
+    const FileListCard = (props) => {
       const src_list = props.sources;
       const handleChange = props.handleChange;
       const focus_id = props.focus_id;
@@ -170,7 +168,9 @@
         ListItemAvatar,
         Avatar,
         Icon,
-        ListItemText
+        List,
+        ListItemText,
+        ListItemButton
       } = MaterialUI;
       const file_items = src_list.map(
         (a) => {
@@ -182,42 +182,33 @@
           }
         }
       );
-      const items = file_items.map((f, idx) => {
+
+      const list_items = file_items.map((f, idx) => {
         return (
-          <FormControlLabel key={`file-${idx}`} value={idx} control={<Radio />}
-            label={
-              <ListItem alignItems="flex-start" dense secondaryAction={
-                <IconButton href={f.href} edge="end" aria-label="link">
-                  <Icon icon='image' >file_open</Icon>
-                </IconButton>
-              }>
-                <ListItemAvatar>
-                  <Avatar>
-                    <MediaIcon file_format={parsePath(f.name).file_format} color={(focus_id === idx) ? "primary" : "inherit"} />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={f.name}
-                  secondary={`${f.date} ${f.size}`}
-                />
-              </ListItem>} />
-        )
-      });
+          <ListItemButton key={`file-${idx}`}
+            selected={idx === focus_id}
+            onClick={(ev) => handleChange(idx)}
+            disablePadding
+          >
+            <ListItemAvatar>
+              <Avatar>
+                <MediaIcon file_format={parsePath(f.name).file_format} color={(focus_id === idx) ? "primary" : "inherit"} />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+              primary={f.name}
+              secondary={`${f.date} ${f.size}`}
+            />
+          </ListItemButton>)
+      }
+      )
 
       return (
         <Card>
-          <CardContent>
-            <FormControl>
-              <FormLabel id="demo-controlled-radio-buttons-group">Files</FormLabel>
-              <RadioGroup
-                aria-labelledby="demo-controlled-radio-buttons-group"
-                name="controlled-radio-buttons-group"
-                value={focus_id}
-                onChange={handleChange}
-              >
-                {items}
-              </RadioGroup>
-            </FormControl></CardContent></Card>
+          <CardContent >
+            <List dense>
+              {list_items}
+            </List></CardContent></Card>
       );
 
 
@@ -235,72 +226,172 @@
       const {
         Typography,
         Card, CardMedia, CardHeader, CardContent,
-        Button, IconButton, Chip, Stack, Avatar, Badge, Backdrop, Icon
+        Button, IconButton, Chip, Stack, Avatar, Badge, Backdrop, Icon, Paper
       } = MaterialUI;
 
 
       return (
-        <Card>
-          <CardHeader
-            avatar={
-              <Badge
-                badgeContent={`${focus_id + (1 - min_idx)}/${num_files}`}
-                color="secondary">
-                <Avatar variant='primary' aria-label="recipe">
-                  <MediaIcon file_format={b[b.length - 1]} />
-                </Avatar></Badge>
-            }
-            title='{directory}'
-            subheader={decodeURI(basename)}
-            action={
-              <IconButton aria-label="settings" href={src_list[0].href}>
-                <Icon icon="drive_folder_upload" >drive_folder_upload</Icon>
-              </IconButton>
-            }
-          />
-          <CardMedia
-            // sx={{ maxHeight: 0.8 * this.state.window_size[1], objectFit: "scale-down" }}
-            src={src_list[focus_id].href}
-            component={mediaType(b[b.length - 1])}
-            title={src_list[focus_id].href}
-          // autoPlay
-          // loop
-          // https://mui.com/material-ui/react-stepper/
-          />
-        </Card>
+        <Paper sx={{ position: 'fixed', top: 0, left: 0, right: 0 }} elevation={3}>
+          <Card>
+            <CardHeader
+              avatar={
+                <Badge
+                  badgeContent={`${focus_id + (1 - min_idx)}/${num_files}`}
+                  color="secondary">
+                  <Avatar variant='primary' aria-label="recipe">
+                    <MediaIcon file_format={b[b.length - 1]} />
+                  </Avatar></Badge>
+              }
+              title='{directory}'
+              subheader={decodeURI(basename)}
+              action={
+                <IconButton aria-label="settings" href={src_list[0].href}>
+                  <Icon icon="drive_folder_upload" >drive_folder_upload</Icon>
+                </IconButton>
+              }
+            />
+            <CardMedia
+              sx={{ maxHeight: 0.8 * useWindowSize()[1], objectFit: "scale-down" }}
+              src={src_list[focus_id].href}
+              component={mediaType(b[b.length - 1])}
+              title={src_list[focus_id].href}
+            // autoPlay
+            // loop
+            // https://mui.com/material-ui/react-stepper/
+            />
+          </Card>
+        </Paper>
       )
 
     }
 
-    const BottomNav = (props) => {
+    const PreviewDialog = (props) => {
+      const is_open = props.is_open;
+      const handleClose = props.handleClose;
+      const idSetter = props.idSetter;
+      const file_url = props.file_url;
+      const file_format = props.file_format;
+      const { Dialog, Button, Icon, Box, Card, CardMedia, CardHeader, CardContent, CardActionArea, Grid, IconButton } = MaterialUI
+
+      return (
+
+        <Dialog
+          onClose={handleClose} open={is_open}
+          elevation={12}
+          fullWidth={true}
+          maxWidth={"lg"}
+
+        >
+          <Grid container spacing={1} justifyContent="center" alignItems="center">
+            <Grid item xs={1}>
+              <IconButton fullWidth size="large" onClick={() => { idSetter(-1) }}>
+                <Icon fontSize="large">navigate_before</Icon>
+              </IconButton>
+            </Grid>
+            <Grid item xs={10}>
+              <Card>
+                <CardActionArea href={file_url}>
+                  <CardMedia
+                    sx={{ maxHeight: 0.8 * useWindowSize()[1], objectFit: "scale-down" }}
+                    src={file_url}
+                    component={mediaType(file_format)}
+                    title={""}
+                  // autoPlay
+                  // loop
+                  // https://mui.com/material-ui/react-stepper/
+                  />
+                </CardActionArea>
+              </Card>
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton fullWidth size="large" onClick={() => { idSetter(1) }}>
+                <Icon fontSize="large">navigate_next</Icon>
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Dialog>
+
+      );
+    }
+
+    const TopNav = (props) => {
+      const focus_id = props.focus_id;
+      const num_files = props.num_files;
+      const min_idx = props.min_idx;
+      const filename = props.filename;
+      const parent_url = props.parent_url;
+      const b = filename.split('.');
+      const { Box, Typography, AppBar, Toolbar, Badge, Avatar, IconButton, Icon } = MaterialUI;
+
+      return (
+        <Box sx={{ flexGrow: 1 }}>
+          <AppBar position="fixed" component="nav">
+            <Toolbar>
+              <Badge
+                badgeContent={`${focus_id + (1 - min_idx)}/${num_files}`}
+                color="secondary"
+                sx={{ mr: 2 }}
+              >
+                <Avatar variant='primary' aria-label="recipe">
+                  <MediaIcon file_format={b[b.length - 1]} />
+                </Avatar>
+              </Badge>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                {filename}
+              </Typography>
+              <Box sx={{ flexGrow: 1 }} />
+              {parent_url ? <IconButton href={parent_url}><Icon>drive_folder_upload</Icon> </IconButton> : null}
+            </Toolbar>
+          </AppBar></Box>);
+    }
+
+
+    const BtmNav = (props) => {
       const focus_id = props.focus_id;
       const idSetter = props.idSetter;
       const id_max = props.id_max;
       const id_min = props.id_min;
-      // const [value, setValue] = React.useState(0);
-      // const ref = React.useRef(null);
-      const { Paper, BottomNavigation, BottomNavigationAction, Icon } = MaterialUI;
+      const focused_url = props.focused_url;
+      const file_format = props.file_format;
+      const is_open_preview = props.is_open_preview;
+      const togglePreview = props.togglePreview;
+      const { Box, ButtonGroup, Button, Typography, AppBar, Toolbar, Badge, Avatar, IconButton, Icon } = MaterialUI;
+
+
+      const BtnPreview = () => {
+        return (
+          <IconButton
+            size={"large"}
+            color={is_open_preview ? "primary" : "secondary"}
+            onClick={togglePreview}
+          >
+            <Icon fontSize="large">preview</Icon>
+          </IconButton>)
+      }
+
       return (
-        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-          <BottomNavigation showLabels
-            onChange={(event, newValue) => {
-              const id = newValue + focus_id;
-              if (id < id_min) {
-                idSetter(id_max);
-              } else if (id_max < id) {
-                idSetter(id_min);
-              } else {
-                idSetter(newValue + focus_id);
-              }
-            }}>
-            <BottomNavigationAction label="Prev" value={-1} icon={<Icon >navigate_before</Icon>} />
-            <BottomNavigationAction label="Next" value={1} icon={<Icon >navigate_next</Icon>} />
-          </BottomNavigation>
-        </Paper>
+        <AppBar
+          position="fixed"
+          color="primary"
+          sx={{ top: 'auto', bottom: 0 }}
+          elevation={24}>
+          <Toolbar sx={{ justifyContent: "center" }}>
+            <Button variant="inherit" onClick={() => { idSetter(-1) }} startIcon={<Icon >navigate_before</Icon>}>
+              Prev
+            </Button>
+            {file_format === "folder" ? (<IconButton color="secondary" href={focused_url} >
+              <Icon fontSize="large">open_in_browser</Icon>
+            </IconButton>) : (<BtnPreview />)}
+            <Button variant="inherit" onClick={() => { idSetter(1) }} endIcon={<Icon >navigate_next</Icon>}>
+              Next
+            </Button>
+          </Toolbar>
+        </AppBar>
       )
     }
+
     const MyApp = (props) => {
-      const { Card, Stack, Container, createTheme, ThemeProvider, CssBaseline, Button, Icon } = MaterialUI
+      const { Card, Stack, Container, createTheme, ThemeProvider, CssBaseline, Button, Icon, Box, Toolbar } = MaterialUI
       const [theme, setTheme] = React.useState(
         createTheme({
           palette: {
@@ -335,10 +426,9 @@
       const src_list = Array.from(file_doc.querySelectorAll('a'));
       const id_min = src_list[0].title === '..' ? 1 : 0;
       const [focus_id, setFocusID] = React.useState(id_min);
+      const [is_preview_opened, setIsPreviewOpened] = React.useState(false);
+
       const id_max = src_list.length - 1;
-
-
-
       const sources = src_list.map((a) => (
         {
           title: a.title,
@@ -350,13 +440,39 @@
           file_format: parsePath(a.href).file_format
         }
       ));
-
+      const focused_url = sources[focus_id].href;
+      const parent_url = sources[0].title === '..' ? sources[0].href : null;
+      // <FilePreview sources={sources} focus_id={focus_id} />
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Container>
-            <FilePreview sources={sources} focus_id={focus_id} />
-            <FileRadioCard sources={sources} focus_id={focus_id} handleChange={(event) => { setFocusID(Number(event.target.value)) }} />
+            <TopNav
+              focus_id={focus_id}
+              num_files={id_max}
+              min_idx={id_min}
+              filename={sources[focus_id].name}
+              parent_url={parent_url}
+            />
+            <Toolbar />
+
+            <PreviewDialog
+              is_open={is_preview_opened}
+              handleClose={() => { setIsPreviewOpened(false) }}
+              file_url={focused_url}
+              file_format={sources[focus_id].file_format}
+              idSetter={(offset) => {
+                const id = offset + focus_id;
+                if (id < id_min) {
+                  setFocusID(id_max);
+                } else if (id_max < id) {
+                  setFocusID(id_min);
+                } else {
+                  setFocusID(offset + focus_id);
+                }
+              }}
+            />
+            <FileListCard sources={sources} focus_id={focus_id} handleChange={(id) => { setFocusID(id) }} />
             <Button
               startIcon={theme.palette.mode === 'dark' ? <Icon icon="brightness_7" /> : <Icon icon="brightness_4" />}
               variant="outlined"
@@ -366,7 +482,26 @@
             >
               {theme.palette.mode} mode
             </Button>
-            <BottomNav focus_id={focus_id} idSetter={setFocusID} id_min={id_min} id_max={id_max} />
+
+            <BtmNav
+              focus_id={focus_id}
+              idSetter={(offset) => {
+                const id = offset + focus_id;
+                if (id < id_min) {
+                  setFocusID(id_max);
+                } else if (id_max < id) {
+                  setFocusID(id_min);
+                } else {
+                  setFocusID(offset + focus_id);
+                }
+              }}
+              id_min={id_min}
+              id_max={id_max}
+              focused_url={focused_url}
+              file_format={sources[focus_id].file_format}
+              is_open_preview={is_preview_opened}
+              togglePreview={() => { setIsPreviewOpened(!is_preview_opened) }}
+            />
           </Container>
         </ThemeProvider>
       )
