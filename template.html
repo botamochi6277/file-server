@@ -271,7 +271,17 @@
       const idSetter = props.idSetter;
       const file_url = props.file_url;
       const file_format = props.file_format;
-      const { Dialog, Button, Icon, Box, Card, CardMedia, CardHeader, CardContent, CardActionArea, Grid, IconButton } = MaterialUI
+      const { Toolbar, FormControlLabel, Switch, Dialog, Button, Icon, Box, Card, CardMedia, CardHeader, CardContent, CardActionArea, CardActions, Grid, IconButton } = MaterialUI
+
+      const [is_auto_playing, setAutoPlaying] = React.useState(false);
+      const [is_mute, setMute] = React.useState(false);
+      const [is_loop, setLoop] = React.useState(false);
+
+      const [scale, setScale] = React.useState(0.8);
+
+
+      const media_type = mediaType(file_format);
+
 
       return (
 
@@ -280,7 +290,6 @@
           elevation={12}
           fullWidth={true}
           maxWidth={"lg"}
-
         >
           <Grid container spacing={1} justifyContent="center" alignItems="center">
             <Grid item xs={1}>
@@ -290,17 +299,62 @@
             </Grid>
             <Grid item xs={10}>
               <Card>
-                <CardActionArea href={file_url}>
-                  <CardMedia
-                    sx={{ maxHeight: 0.8 * useWindowSize()[1], objectFit: "scale-down" }}
-                    src={file_url}
-                    component={mediaType(file_format)}
-                    title={""}
-                  // autoPlay
-                  // loop
-                  // https://mui.com/material-ui/react-stepper/
-                  />
-                </CardActionArea>
+
+
+                <CardMedia
+                  sx={{ maxHeight: scale * useWindowSize()[1], objectFit: "scale-down" }}
+                  src={file_url}
+                  component={media_type}
+                  title={media_type}
+                  autoPlay={is_auto_playing}
+                  loop={is_loop}
+                  controls
+                />
+
+
+                <Toolbar sx={{ justifyContent: "center" }}>
+                  <IconButton
+                    color={"primary"}
+                    size="large"
+                    href={file_url}>
+                    <Icon fontSize="large">file_open</Icon>
+                  </IconButton>
+                  <IconButton
+                    sx={{ display: (media_type === "img" ? "inherit" : "none") }}
+                    color={scale > 1.0 ? "inherit" : "inherit"}
+                    size="large"
+                    onClick={() => {
+                      if (scale < 1.0) {
+                        setScale(1.2)
+                      } else {
+                        setScale(0.8)
+                      }
+                    }}
+                  >
+                    <Icon fontSize="large">
+                      {scale < 1.0 ? "zoom_in" : "zoom_out"}
+                    </Icon>
+                  </IconButton>
+
+                  <IconButton
+                    sx={{ display: ((media_type === "video") | (media_type === "audio") ? "inherit" : "none") }}
+                    color={is_auto_playing ? "success" : "inherit"}
+                    size="large" onClick={() => { setAutoPlaying(!is_auto_playing) }}>
+                    <Icon fontSize="large">start</Icon>
+                  </IconButton>
+                  <IconButton
+                    sx={{ display: ((media_type === "video") | (media_type === "audio") ? "inherit" : "none") }}
+                    color={is_loop ? "success" : "inherit"}
+                    size="large" onClick={() => { setLoop(!is_loop) }}>
+                    <Icon fontSize="large">repeat</Icon>
+                  </IconButton>
+                  <IconButton
+                    color="warning"
+                    size="large" onClick={() => { handleClose(false) }}>
+                    <Icon fontSize="large">close</Icon>
+                  </IconButton>
+                </Toolbar>
+
               </Card>
             </Grid>
             <Grid item xs={1}>
@@ -358,7 +412,7 @@
       const { Box, ButtonGroup, Button, Typography, AppBar, Toolbar, Badge, Avatar, IconButton, Icon } = MaterialUI;
 
 
-      const BtnPreview = () => {
+      const PreviewButton = () => {
         return (
           <IconButton
             size={"large"}
@@ -381,7 +435,7 @@
             </Button>
             {file_format === "folder" ? (<IconButton color="secondary" href={focused_url} >
               <Icon fontSize="large">open_in_browser</Icon>
-            </IconButton>) : (<BtnPreview />)}
+            </IconButton>) : (<PreviewButton />)}
             <Button variant="inherit" onClick={() => { idSetter(1) }} endIcon={<Icon >navigate_next</Icon>}>
               Next
             </Button>
