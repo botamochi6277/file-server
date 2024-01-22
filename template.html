@@ -291,9 +291,9 @@
           fullWidth={true}
           maxWidth={"lg"}
         >
-          <Grid container spacing={1} justifyContent="center" alignItems="center">
+          <Grid container spacing={0} justifyContent="center" alignItems="center">
             <Grid item xs={1}>
-              <IconButton fullWidth size="large" onClick={() => { idSetter(-1) }}>
+              <IconButton size="large" onClick={() => { idSetter(-1) }}>
                 <Icon fontSize="large">navigate_before</Icon>
               </IconButton>
             </Grid>
@@ -358,7 +358,7 @@
               </Card>
             </Grid>
             <Grid item xs={1}>
-              <IconButton fullWidth size="large" onClick={() => { idSetter(1) }}>
+              <IconButton size="large" onClick={() => { idSetter(1) }}>
                 <Icon fontSize="large">navigate_next</Icon>
               </IconButton>
             </Grid>
