@@ -231,36 +231,20 @@
 
 
       return (
-        <Paper sx={{ position: 'fixed', top: 0, left: 0, right: 0 }} elevation={3}>
-          <Card>
-            <CardHeader
-              avatar={
-                <Badge
-                  badgeContent={`${focus_id + (1 - min_idx)}/${num_files}`}
-                  color="secondary">
-                  <Avatar variant='primary' aria-label="recipe">
-                    <MediaIcon file_format={b[b.length - 1]} />
-                  </Avatar></Badge>
-              }
-              title='{directory}'
-              subheader={decodeURI(basename)}
-              action={
-                <IconButton aria-label="settings" href={src_list[0].href}>
-                  <Icon icon="drive_folder_upload" >drive_folder_upload</Icon>
-                </IconButton>
-              }
-            />
-            <CardMedia
-              sx={{ maxHeight: 0.8 * useWindowSize()[1], objectFit: "scale-down" }}
-              src={src_list[focus_id].href}
-              component={mediaType(b[b.length - 1])}
-              title={src_list[focus_id].href}
-            // autoPlay
-            // loop
-            // https://mui.com/material-ui/react-stepper/
-            />
-          </Card>
-        </Paper>
+
+        <Card>
+          <CardMedia
+            sx={{ maxHeight: 0.75 * useWindowSize()[1], objectFit: "scale-down" }}
+            src={src_list[focus_id].href}
+            component={mediaType(b[b.length - 1])}
+            title={src_list[focus_id].href}
+            controls
+          // autoPlay
+          // loop
+          // https://mui.com/material-ui/react-stepper/
+          />
+        </Card>
+
       )
 
     }
@@ -288,83 +272,71 @@
         <Dialog
           onClose={handleClose} open={is_open}
           elevation={12}
-          fullWidth={true}
-          maxWidth={"lg"}
+          // fullWidth={true}
+          maxWidth={"xl"}
+          scroll={"body"}
         >
-          <Grid container spacing={0} justifyContent="center" alignItems="center">
-            <Grid item xs={1}>
+          <Card>
+            <CardMedia
+              sx={{ maxHeight: scale * useWindowSize()[1], objectFit: "scale-down" }}
+              src={file_url}
+              component={media_type}
+              title={media_type}
+              autoPlay={is_auto_playing}
+              loop={is_loop}
+              controls
+            />
+
+            <Toolbar sx={{ justifyContent: "space-evenly" }}>
               <IconButton size="large" onClick={() => { idSetter(-1) }}>
                 <Icon fontSize="large">navigate_before</Icon>
               </IconButton>
-            </Grid>
-            <Grid item xs={10}>
-              <Card>
+              <IconButton
+                color={"primary"}
+                size="large"
+                href={file_url}>
+                <Icon fontSize="large">file_open</Icon>
+              </IconButton>
+              <IconButton
+                sx={{ display: (media_type === "img" ? "inherit" : "none") }}
+                color={scale > 1.0 ? "inherit" : "inherit"}
+                size="large"
+                onClick={() => {
+                  if (scale < 1.0) {
+                    setScale(4.0)
+                  } else {
+                    setScale(0.8)
+                  }
+                }}
+              >
+                <Icon fontSize="large">
+                  {scale < 1.0 ? "zoom_in" : "zoom_out"}
+                </Icon>
+              </IconButton>
 
-
-                <CardMedia
-                  sx={{ maxHeight: scale * useWindowSize()[1], objectFit: "scale-down" }}
-                  src={file_url}
-                  component={media_type}
-                  title={media_type}
-                  autoPlay={is_auto_playing}
-                  loop={is_loop}
-                  controls
-                />
-
-
-                <Toolbar sx={{ justifyContent: "center" }}>
-                  <IconButton
-                    color={"primary"}
-                    size="large"
-                    href={file_url}>
-                    <Icon fontSize="large">file_open</Icon>
-                  </IconButton>
-                  <IconButton
-                    sx={{ display: (media_type === "img" ? "inherit" : "none") }}
-                    color={scale > 1.0 ? "inherit" : "inherit"}
-                    size="large"
-                    onClick={() => {
-                      if (scale < 1.0) {
-                        setScale(1.2)
-                      } else {
-                        setScale(0.8)
-                      }
-                    }}
-                  >
-                    <Icon fontSize="large">
-                      {scale < 1.0 ? "zoom_in" : "zoom_out"}
-                    </Icon>
-                  </IconButton>
-
-                  <IconButton
-                    sx={{ display: ((media_type === "video") | (media_type === "audio") ? "inherit" : "none") }}
-                    color={is_auto_playing ? "success" : "inherit"}
-                    size="large" onClick={() => { setAutoPlaying(!is_auto_playing) }}>
-                    <Icon fontSize="large">start</Icon>
-                  </IconButton>
-                  <IconButton
-                    sx={{ display: ((media_type === "video") | (media_type === "audio") ? "inherit" : "none") }}
-                    color={is_loop ? "success" : "inherit"}
-                    size="large" onClick={() => { setLoop(!is_loop) }}>
-                    <Icon fontSize="large">repeat</Icon>
-                  </IconButton>
-                  <IconButton
-                    color="warning"
-                    size="large" onClick={() => { handleClose(false) }}>
-                    <Icon fontSize="large">close</Icon>
-                  </IconButton>
-                </Toolbar>
-
-              </Card>
-            </Grid>
-            <Grid item xs={1}>
+              <IconButton
+                sx={{ display: ((media_type === "video") | (media_type === "audio") ? "inherit" : "none") }}
+                color={is_auto_playing ? "success" : "inherit"}
+                size="large" onClick={() => { setAutoPlaying(!is_auto_playing) }}>
+                <Icon fontSize="large">start</Icon>
+              </IconButton>
+              <IconButton
+                sx={{ display: ((media_type === "video") | (media_type === "audio") ? "inherit" : "none") }}
+                color={is_loop ? "success" : "inherit"}
+                size="large" onClick={() => { setLoop(!is_loop) }}>
+                <Icon fontSize="large">repeat</Icon>
+              </IconButton>
+              <IconButton
+                color="warning"
+                size="large" onClick={() => { handleClose(false) }}>
+                <Icon fontSize="large">close</Icon>
+              </IconButton>
               <IconButton size="large" onClick={() => { idSetter(1) }}>
                 <Icon fontSize="large">navigate_next</Icon>
               </IconButton>
-            </Grid>
-          </Grid>
+            </Toolbar>
+          </Card>
         </Dialog>
-
       );
     }
 
@@ -443,9 +415,38 @@
         </AppBar>
       )
     }
+    function CustomTabPanel(props) {
+      const { Box, Typography } = MaterialUI;
+      const { children, value, index, ...other } = props;
+
+      return (
+        <div
+          role="tabpanel"
+          hidden={value !== index}
+          id={`simple-tabpanel-${index}`}
+          aria-labelledby={`simple-tab-${index}`}
+          {...other}
+        >
+          {value === index && (
+            <Box sx={{ p: 3 }}>
+              <Typography>{children}</Typography>
+            </Box>
+          )}
+        </div>
+      );
+    }
+
+
+    function a11yProps(index) {
+      return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+      };
+    }
 
     const MyApp = (props) => {
-      const { Card, Stack, Container, createTheme, ThemeProvider, CssBaseline, Button, Icon, Box, Toolbar } = MaterialUI
+      const { Card, Stack, Container, createTheme, ThemeProvider, CssBaseline, Button, Icon, Box, Toolbar, Tab, Tabs } = MaterialUI;
+
       const [theme, setTheme] = React.useState(
         createTheme({
           palette: {
@@ -481,7 +482,7 @@
       const id_min = src_list[0].title === '..' ? 1 : 0;
       const [focus_id, setFocusID] = React.useState(id_min);
       const [is_preview_opened, setIsPreviewOpened] = React.useState(false);
-
+      const [tab_id, setTabId] = React.useState(0);
       const id_max = src_list.length - 1;
       const sources = src_list.map((a) => (
         {
@@ -496,6 +497,13 @@
       ));
       const focused_url = sources[focus_id].href;
       const parent_url = sources[0].title === '..' ? sources[0].href : null;
+      const preview_tab_id = 1;
+      function a11yProps(index) {
+        return {
+          id: `simple-tab-${index}`,
+          'aria-controls': `simple-tabpanel-${index}`,
+        };
+      }
       // <FilePreview sources={sources} focus_id={focus_id} />
       return (
         <ThemeProvider theme={theme}>
@@ -510,32 +518,25 @@
             />
             <Toolbar />
 
-            <PreviewDialog
-              is_open={is_preview_opened}
-              handleClose={() => { setIsPreviewOpened(false) }}
-              file_url={focused_url}
-              file_format={sources[focus_id].file_format}
-              idSetter={(offset) => {
-                const id = offset + focus_id;
-                if (id < id_min) {
-                  setFocusID(id_max);
-                } else if (id_max < id) {
-                  setFocusID(id_min);
-                } else {
-                  setFocusID(offset + focus_id);
-                }
-              }}
-            />
-            <FileListCard sources={sources} focus_id={focus_id} handleChange={(id) => { setFocusID(id) }} />
-            <Button
-              startIcon={theme.palette.mode === 'dark' ? <Icon icon="brightness_7" /> : <Icon icon="brightness_4" />}
-              variant="outlined"
-              color="secondary"
-              onClick={() => toggleTheme(theme)}
-              fullWidth
-            >
-              {theme.palette.mode} mode
-            </Button>
+
+            <CustomTabPanel value={tab_id} index={0}>
+              <FileListCard sources={sources} focus_id={focus_id} handleChange={(id) => { setFocusID(id) }} />
+              <Button
+                startIcon={theme.palette.mode === 'dark' ? <Icon icon="brightness_7" /> : <Icon icon="brightness_4" />}
+                variant="outlined"
+                color="secondary"
+                onClick={() => toggleTheme(theme)}
+                fullWidth
+              >
+                {theme.palette.mode} mode
+              </Button>
+            </CustomTabPanel>
+            <CustomTabPanel value={tab_id} index={preview_tab_id}>
+              <FilePreview
+                focus_id={focus_id}
+                sources={sources}
+              />
+            </CustomTabPanel>
 
             <BtmNav
               focus_id={focus_id}
@@ -553,8 +554,14 @@
               id_max={id_max}
               focused_url={focused_url}
               file_format={sources[focus_id].file_format}
-              is_open_preview={is_preview_opened}
-              togglePreview={() => { setIsPreviewOpened(!is_preview_opened) }}
+              is_open_preview={tab_id === preview_tab_id}
+              togglePreview={() => {
+                if (tab_id === preview_tab_id) {
+                  setTabId(0);
+                } else {
+                  setTabId(preview_tab_id);
+                }
+              }}
             />
           </Container>
         </ThemeProvider>
