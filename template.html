@@ -181,6 +181,8 @@
             date: a.date
           }
         }
+      ).toSorted(
+        (a, b) => a.name.localeCompare(b.name)
       );
 
       const list_items = file_items.map((f, idx) => {
@@ -243,10 +245,12 @@
           // loop
           // https://mui.com/material-ui/react-stepper/
           />
+          {mediaType(b[b.length - 1]) == "" ?
+            <CardContent>
+              {`${src_list[focus_id].href} cannot be previewed.`}
+            </CardContent> : null}
         </Card>
-
       )
-
     }
 
     const PreviewDialog = (props) => {
@@ -511,7 +515,7 @@
           'aria-controls': `simple-tabpanel-${index}`,
         };
       }
-      // <FilePreview sources={sources} focus_id={focus_id} />
+
       return (
         <ThemeProvider theme={theme}>
           <CssBaseline />
