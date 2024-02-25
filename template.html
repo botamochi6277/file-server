@@ -341,13 +341,10 @@
     }
 
     const TopNav = (props) => {
-      const focus_id = props.focus_id;
-      const num_files = props.num_files;
-      const min_idx = props.min_idx;
-      const filename = props.filename;
-      const parent_url = props.parent_url;
+
+      const { focus_id, num_files, min_idx, filename, parent_url, theme, onToggleTheme } = props;
       const b = filename.split('.');
-      const { Box, Typography, AppBar, Toolbar, Badge, Avatar, IconButton, Icon } = MaterialUI;
+      const { Box, Typography, AppBar, Toolbar, Badge, Avatar, IconButton, Icon, Switch, Stack } = MaterialUI;
 
       return (
         <Box sx={{ flexGrow: 1 }}>
@@ -366,6 +363,15 @@
                 {filename}
               </Typography>
               <Box sx={{ flexGrow: 1 }} />
+              <Stack direction="row" spacing={0} alignItems="center">
+                <Icon icon="light_mode" size="small">light_mode</Icon>
+                <Switch
+                  checked={theme.palette.mode === 'dark'}
+                  onChange={props.onToggleTheme}
+                  color="secondary"
+                />
+                <Icon icon="dark_mode" >dark_mode</Icon>
+              </Stack>
               {parent_url ? <IconButton href={parent_url}><Icon>drive_folder_upload</Icon> </IconButton> : null}
             </Toolbar>
           </AppBar></Box>);
@@ -381,10 +387,10 @@
       const file_format = props.file_format;
       const is_open_preview = props.is_open_preview;
       const togglePreview = props.togglePreview;
-      const { Box, ButtonGroup, Button, Typography, AppBar, Toolbar, Badge, Avatar, IconButton, Icon } = MaterialUI;
+      const { Box, ButtonGroup, Button, Typography, AppBar, Toolbar, Badge, Avatar, IconButton, Icon, FormControlLabel, Switch } = MaterialUI;
 
 
-      const PreviewButton = () => {
+      const PreviewSwitch = () => {
         return (
           <IconButton
             size={"large"}
@@ -407,7 +413,7 @@
             </Button>
             {file_format === "folder" ? (<IconButton color="secondary" href={focused_url} >
               <Icon fontSize="large">open_in_browser</Icon>
-            </IconButton>) : (<PreviewButton />)}
+            </IconButton>) : (<PreviewSwitch />)}
             <Button variant="inherit" onClick={() => { idSetter(1) }} endIcon={<Icon >navigate_next</Icon>}>
               Next
             </Button>
@@ -497,6 +503,7 @@
       ));
       const focused_url = sources[focus_id].href;
       const parent_url = sources[0].title === '..' ? sources[0].href : null;
+      const num_files = sources[0].title === '..' ? id_max : id_max + 1;
       const preview_tab_id = 1;
       function a11yProps(index) {
         return {
@@ -511,25 +518,18 @@
           <Container>
             <TopNav
               focus_id={focus_id}
-              num_files={id_max}
+              num_files={num_files}
               min_idx={id_min}
               filename={sources[focus_id].name}
               parent_url={parent_url}
+              theme={theme}
+              onToggleTheme={() => { toggleTheme(theme) }}
             />
             <Toolbar />
 
 
             <CustomTabPanel value={tab_id} index={0}>
               <FileListCard sources={sources} focus_id={focus_id} handleChange={(id) => { setFocusID(id) }} />
-              <Button
-                startIcon={theme.palette.mode === 'dark' ? <Icon icon="brightness_7" /> : <Icon icon="brightness_4" />}
-                variant="outlined"
-                color="secondary"
-                onClick={() => toggleTheme(theme)}
-                fullWidth
-              >
-                {theme.palette.mode} mode
-              </Button>
             </CustomTabPanel>
             <CustomTabPanel value={tab_id} index={preview_tab_id}>
               <FilePreview
