@@ -125,7 +125,7 @@
     };
 
     const FileListCard = (props) => {
-      const src_list = props.sources;
+      const sources = props.sources;
       const handleChange = props.handleChange;
       const focus_id = props.focus_id;
 
@@ -172,20 +172,8 @@
         ListItemText,
         ListItemButton
       } = MaterialUI;
-      const file_items = src_list.map(
-        (a) => {
-          return {
-            name: a.name,
-            href: a.href,
-            size: filesizeFormat(a.size),
-            date: a.date
-          }
-        }
-      ).toSorted(
-        (a, b) => a.name.localeCompare(b.name)
-      );
 
-      const list_items = file_items.map((f, idx) => {
+      const list_items = sources.map((f, idx) => {
         return (
           <ListItemButton key={`file-${idx}`}
             selected={idx === focus_id}
@@ -199,7 +187,7 @@
             </ListItemAvatar>
             <ListItemText
               primary={f.name}
-              secondary={`${f.date} ${f.size}`}
+              secondary={`${f.date} ${filesizeFormat(f.size)}`}
             />
           </ListItemButton>)
       }
@@ -218,13 +206,13 @@
 
     const FilePreview = (props) => {
       const focus_id = props.focus_id;
-      const src_list = props.sources;
+      const sources = props.sources;
 
-      const min_idx = src_list[0].title === '..' ? 1 : 0
-      const path_arr = src_list[focus_id].href.split('/')//array of path
+      const min_idx = sources[0].title === '..' ? 1 : 0
+      const path_arr = sources[focus_id].href.split('/')//array of path
       const basename = path_arr[path_arr.length - 1]
       const b = basename.split('.')
-      const num_files = src_list.length - min_idx;
+      const num_files = sources.length - min_idx;
       const {
         Typography,
         Card, CardMedia, CardHeader, CardContent,
@@ -237,9 +225,9 @@
         <Card>
           <CardMedia
             sx={{ maxHeight: 0.75 * useWindowSize()[1], objectFit: "scale-down" }}
-            src={src_list[focus_id].href}
+            src={sources[focus_id].href}
             component={mediaType(b[b.length - 1])}
-            title={src_list[focus_id].href}
+            title={sources[focus_id].href}
             controls
           // autoPlay
           // loop
@@ -247,7 +235,7 @@
           />
           {mediaType(b[b.length - 1]) == "" ?
             <CardContent>
-              {`${src_list[focus_id].href} cannot be previewed.`}
+              {`${sources[focus_id].href} cannot be previewed.`}
             </CardContent> : null}
         </Card>
       )
@@ -504,7 +492,18 @@
           dirname: parsePath(a.href).dirname,
           file_format: parsePath(a.href).file_format
         }
-      ));
+      )).toSorted(
+        (a, b) => {
+          if (a.name === "..") {
+            return -1;
+          } else if (b.name === "..") {
+            return 1;
+          }
+          return a.name.localeCompare(b.name);
+        }
+      );
+
+
       const focused_url = sources[focus_id].href;
       const parent_url = sources[0].title === '..' ? sources[0].href : null;
       const num_files = sources[0].title === '..' ? id_max : id_max + 1;
